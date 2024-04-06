@@ -39,8 +39,8 @@ export default class CanvasNavigation {
     } else {
       // Pan the canvas
       const panSpeed = 5;
-      this.panX += event.deltaX * panSpeed;
-      this.panY += event.deltaY * panSpeed;
+      this.panX -= event.deltaX * panSpeed;
+      this.panY -= event.deltaY * panSpeed;
     }
 
     this.updateCanvas();
