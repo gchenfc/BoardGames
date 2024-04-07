@@ -1,8 +1,10 @@
 import Point2 from "./point2.js";
 
-const SelectBehaviors = Object.freeze({
+export const SelectBehaviors = Object.freeze({
   HIGHLIGHT: Symbol("SelectBehaviors.HIGHLIGHT"),
+  MAKE_PREVIEWS: Symbol("SelectBehaviors.MAKE_PREVIEWS"), // Not yet implemented
   FOLLOW_MOUSE: Symbol("SelectBehaviors.FOLLOW_MOUSE"),
+  FOLLOW_MOUSE_SNAP: Symbol("SelectBehaviors.FOLLOW_MOUSE_SNAP"), // Not yet implemented
 });
 
 const DEFAULT_PROPERTIES = {
@@ -46,7 +48,7 @@ export class VisualElement {
       ctx.fillText(this.toString(), this.point.x, this.point.y + 10, this.width);
     }
 
-    if (this.properties.isSelected) {
+    if (this.state.isSelected || this.state.isDragging) {
       ctx.strokeStyle = "rgba(0, 255, 0, 1)";
       ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
       ctx.strokeRect(this.point.x, this.point.y, this.width, this.height);
