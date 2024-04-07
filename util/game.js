@@ -322,8 +322,6 @@ class Canvas {
   }
 
   onMouseHover(event) {
-    // TODO
-    this.ctx.fillText("Hover", 210, 210);
     if (
       this.game.selectedElemContext &&
       this.game.selectedElemContext.elem.properties.selectBehavior == SelectBehaviors.FOLLOW_MOUSE

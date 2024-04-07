@@ -1,11 +1,13 @@
 import Game from "../util/game.js";
 import { BoardElement, FloatingElement, SelectBehaviors } from "../util/element.js";
 import Point2 from "../util/point2.js";
+import { SPRITES, CARDS } from "./cards.js";
+import shuffleArray from "../util/shuffle.js";
 
 const GRID_DIM = 100,
   GRID_PADDING = 10;
-const GRID_W = 4,
-  GRID_H = 4;
+const GRID_W = 40,
+  GRID_H = 40;
 
 class GameState {
   constructor(grid, drawPile, meeples, scores) {
@@ -18,7 +20,7 @@ class GameState {
 
 class ServerDummy {
   constructor() {
-    this.gameState = new GameState({}, ["A", "B", "C", "D"], {}, {});
+    this.gameState = new GameState({}, shuffleArray(CARDS), {}, {});
   }
 
   doMove(target) {
@@ -27,6 +29,7 @@ class ServerDummy {
   }
 }
 const server = new ServerDummy();
+window.myServer = server;
 
 class Carcassonne extends Game {
   constructor() {
@@ -64,6 +67,11 @@ class Carcassonne extends Game {
     );
 
     super(visualElements);
+
+    // As a precaution, update the draw every 200ms.  Also helps with sprite loading
+    setInterval(() => {
+      this.updateDraw();
+    }, 200);
   }
 
   updateGameState(gameState) {
@@ -105,15 +113,24 @@ class Carcassonne extends Game {
 
 class Card extends BoardElement {
   constructor(i, j) {
-    super(i * GRID_DIM, j * GRID_DIM, GRID_DIM - GRID_PADDING, GRID_DIM - GRID_PADDING);
+    super(i * GRID_DIM, j * GRID_DIM, GRID_DIM - GRID_PADDING, GRID_DIM - GRID_PADDING, 1);
     this.i = i;
     this.j = j;
     this.card = null;
   }
 
+  drawSprite(ctx) {
+    if (this.card) {
+      ctx.drawImage(this.sprite, this.point.x, this.point.y, this.width, this.height);
+    } else {
+      ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
+      ctx.fillRect(this.point.x, this.point.y, this.width, this.height);
+    }
+  }
+
   setCard(card) {
     this.card = card;
-    // TODO: set sprite
+    this.sprite = card ? SPRITES[card] : 1;
   }
 
   toString() {

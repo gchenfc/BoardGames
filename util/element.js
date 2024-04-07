@@ -33,12 +33,17 @@ export class VisualElement {
     this.state = { ...DEFAULT_STATE, ...state };
   }
 
+  /// Function to draw this element.  Can override this function to draw custom elements
+  drawSprite(ctx) {
+    if (this.sprite) {
+      ctx.drawImage(this.sprite, this.point.x, this.point.y, this.width, this.height);
+    }
+  }
+
   draw(ctx, name = "", debug = false) {
     ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
     ctx.fillRect(this.point.x, this.point.y, this.width, this.height);
-    if (this.sprite) {
-      // TODO
-    }
+    this.drawSprite(ctx);
     if (debug || !this.sprite) {
       ctx.strokeStyle = "rgba(0, 0, 0, 1)";
       ctx.strokeRect(this.point.x, this.point.y, this.width, this.height);
