@@ -12,6 +12,10 @@ export default class Point2 {
     return new Point2(this.x - other.x, this.y - other.y);
   }
 
+  scale(factor) {
+    return new Point2(this.x * factor, this.y * factor);
+  }
+
   dot(other) {
     return this.x * other.x + this.y * other.y;
   }
@@ -24,5 +28,10 @@ export default class Point2 {
 
   toString() {
     return `Point2(${this.x}, ${this.y})`;
+  }
+
+  static FromString(s) {
+    // Format: "Point2(1.234, 5.678)"
+    return new Point2(...s.match(/-?\d+\.\d+/g).map(parseFloat));
   }
 }

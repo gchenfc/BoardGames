@@ -1,21 +1,34 @@
 import Point2 from "./point2.js";
 
+const SelectBehaviors = Object.freeze({
+  HIGHLIGHT: Symbol("SelectBehaviors.HIGHLIGHT"),
+  FOLLOW_MOUSE: Symbol("SelectBehaviors.FOLLOW_MOUSE"),
+});
+
 const DEFAULT_PROPERTIES = {
   isFloating: false,
   isDraggable: false,
-  isClickable: true,
+  isClickable: false,
   isSelectable: null,
-  isHighlightable: false,
+  isHoverable: false,
+  selectBehavior: SelectBehaviors.HIGHLIGHT,
+};
+
+const DEFAULT_STATE = {
   isHidden: false,
+  isDragging: false,
+  isSelected: false,
+  isHovered: false,
 };
 
 export class VisualElement {
-  constructor(x, y, width, height, sprite = null, properties = {}) {
+  constructor(x, y, width, height, sprite = null, properties = {}, state = {}) {
     this.point = new Point2(x, y);
     this.width = width;
     this.height = height;
-    this.properties = { ...DEFAULT_PROPERTIES, ...properties };
     this.sprite = sprite;
+    this.properties = { ...DEFAULT_PROPERTIES, ...properties };
+    this.state = { ...DEFAULT_STATE, ...state };
   }
 
   draw(ctx, name = "", debug = false) {
@@ -31,6 +44,13 @@ export class VisualElement {
       ctx.fillStyle = "black";
       ctx.fillText(name, this.point.x, this.point.y, this.width);
       ctx.fillText(this.toString(), this.point.x, this.point.y + 10, this.width);
+    }
+
+    if (this.properties.isSelected) {
+      ctx.strokeStyle = "rgba(0, 255, 0, 1)";
+      ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+      ctx.strokeRect(this.point.x, this.point.y, this.width, this.height);
+      ctx.fillRect(this.point.x, this.point.y, this.width, this.height);
     }
   }
 
@@ -49,13 +69,13 @@ export class VisualElement {
 }
 
 export class BoardElement extends VisualElement {
-  constructor(x, y, width, height, sprite = null, properties = {}) {
-    super(x, y, width, height, sprite, { ...DEFAULT_PROPERTIES, ...properties });
+  constructor(x, y, width, height, sprite = null, properties = {}, state = {}) {
+    super(x, y, width, height, sprite, properties, state);
   }
 }
 
 export class FloatingElement extends VisualElement {
-  constructor(x, y, width, height, sprite = null, properties = {}) {
-    super(x, y, width, height, sprite, { ...DEFAULT_PROPERTIES, isFloating: true, ...properties });
+  constructor(x, y, width, height, sprite = null, properties = {}, state = {}) {
+    super(x, y, width, height, sprite, { isFloating: true, ...properties }, state);
   }
 }

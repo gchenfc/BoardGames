@@ -46,52 +46,6 @@ class Carcassonne extends Game {
   updateGameState(gameState) {
     this._WARNING("updateGameState");
   }
-
-  /// The user click-ed an element
-  onElementClick(elementKey) {
-    console.log(`Clicked on ${elementKey}`);
-  }
-
-  /// The user dragged an element
-  onElementDragStart(elementKey) {
-    if (elementKey === "topDrawCard") {
-      // Move to board coordinates (not floating)
-      const topCard = this.visualElements["topDrawCard"];
-      // topCard.properties.isFloating = false;
-    }
-  }
-
-  onElementDragStartUndo(elementKey) {
-    if (elementKey === "topDrawCard") {
-      // Move back to floating coordinates
-      const topCard = this.visualElements["topDrawCard"];
-      // topCard.properties.isFloating = true;
-    }
-  }
-
-  /// The user dragged an element
-  onElementDragEnd(elementKey) {
-    if (elementKey === "topDrawCard") {
-      // Add the previous top draw card to the board and replace it with a new card
-      this.visualElements["123"] = this.visualElements["topDrawCard"];
-      this.setFloating(this.visualElements["123"], false);
-      this.visualElements["123"].properties.isDraggable = false;
-      // New top draw card
-      this.visualElements["topDrawCard"] = new FloatingElement(
-        10,
-        10,
-        GRID_DIM - GRID_PADDING,
-        GRID_DIM - GRID_PADDING,
-        null,
-        {
-          isDraggable: true,
-        }
-      );
-      this.updateDraw();
-      console.log(this.visualElements);
-    }
-    console.log(`Dropped ${elementKey}`);
-  }
 }
 
 class Card extends BoardElement {

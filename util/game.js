@@ -8,6 +8,7 @@ export default class Game {
   constructor(visualElements = {}, debug = false) {
     this.visualElements = visualElements;
     this.canvas = new Canvas(this, debug);
+    this.selectedElemContext = null;
   }
 
   /***********************************  Functions to Implement  ***********************************/
@@ -16,24 +17,64 @@ export default class Game {
     this._WARNING("updateGameState");
   }
 
+  validMoves(elemKey) {
+    this._WARNING(
+      "validMoves",
+      "Return either:\n" +
+        "\t- Array[ElementKeys] an array of valid elements to drop onto\n" +
+        "\t- Callable[Point2] -> bool a function that checks if a point is a valid drop location"
+    );
+  }
+
+  tryMoveElemToElem(fromElemKey, toElemKey) {
+    this._WARNING("tryMoveElemToElem");
+  }
+
+  tryMoveElemToPoint(fromElemKey, toPoint) {
+    this._WARNING("tryMoveElemToPoint");
+  }
+
+  /******************************  Optional Functions to Implement  ******************************/
   /// The user click-ed an element
   onElementClick(elementKey) {
-    this._WARNING("onElementClick");
+    if (this.selectedElemContext) {
+      // We already have an element selected
+      console.assert(this.selectedElemContext.validMovesType == "elem");
+      if (this.validMoves.includes(elementKey)) {
+        this.tryMoveElemToElem(this.selectedElemContext.key, elementKey);
+        this.selectedElemContext = null;
+      } else {
+        this.selectedElemContext = null; // fall through
+      }
+    }
+
+    if (!this.selectedElemContext) {
+      // We didn't currently have anything selected
+      if (this.visualElements[elementKey].properties.isClickable) {
+        // TODO: what behavior should this have?
+      } else if (this.visualElements[elementKey].properties.isSelectable) {
+        // This is now the selected element
+        this.selectedElemContext = this.elemContext(elementKey);
+      } else {
+        // This element is not clickable or selectable so do nothing
+      }
+    }
   }
 
-  /// The user dragged an element.  This should usually change only appearances but not game state.
-  onElementDragStart(elementKey) {
-    this._WARNING("onElementDragStart");
-  }
-
-  /// The user abandoned dragging an element.  Undo the appearance changes.
-  onElementDragStartUndo(elementKey) {
-    this._WARNING("onElementDragStart");
-  }
-
-  /// The user dragged an element
-  onElementDragEnd(elementKey) {
-    this._WARNING("onElementDragEnd");
+  /// The user click-ed the canvas
+  onPointClick(point) {
+    if (this.selectedElemContext) {
+      console.assert(this.selectedElemContext.validMovesType == "point");
+      if (this.validMoves(point)) {
+        this.tryMoveElemToPoint(this.selectedElemContext.key, point);
+        this.selectedElemContext = null;
+      } else {
+        this.selectedElemContext = null; // fall through
+      }
+    }
+    if (!this.selectedElemContext) {
+      // We didn't currently have anything selected - do nothing
+    }
   }
 
   /**************************  Functions available to use (do not edit)  **************************/
@@ -61,11 +102,29 @@ export default class Game {
     elem.point = this.canvas.absToElemParent(abs, elem);
   }
 
+  elemContext(key) {
+    const elem = this.visualElements[key];
+    const validMoves = this.validMoves(key);
+    const validMovesType =
+      validMoves instanceof Array ? "elem" : validMoves instanceof Function ? "point" : null;
+    return {
+      key: key,
+      elem: elem,
+      validMovesType: validMovesType,
+      validMoves: validMoves,
+    };
+  }
+
   /*******************************  Helper Functions (don't touch)  *******************************/
   // Warning message for unimplemented methods
-  _WARNING(fName = "unknown method") {
+  _WARNING(fName = "unknown method", message = "") {
     console.warn(
-      'WARNING! Function "' + fName + '" is not implemented in ' + this.constructor.name
+      'WARNING! Function "' +
+        fName +
+        '" is not implemented in ' +
+        this.constructor.name +
+        ". " +
+        message
     );
   }
 }
@@ -86,6 +145,21 @@ class Canvas {
     this.canvas.addEventListener("mousedown", this.onMouseDown.bind(this));
     this.canvas.addEventListener("mousemove", this.onMouseMove.bind(this));
     this.canvas.addEventListener("mouseup", this.onMouseUp.bind(this));
+    this.canvas.addEventListener("touchstart", (e) => {
+      if (e.touches.length === 1) {
+        return this.onMouseDown(e.touches[0]);
+      }
+    });
+    this.canvas.addEventListener("touchmove", (e) => {
+      if (e.touches.length === 1) {
+        return this.onMouseMove(e.touches[0]);
+      }
+    });
+    this.canvas.addEventListener("touchend", (e) => {
+      if (e.touches.length === 0) {
+        return this.onMouseUp(e.changedTouches[0]);
+      }
+    });
   }
 
   draw() {
@@ -107,65 +181,108 @@ class Canvas {
   }
 
   onMouseDown(event) {
-    // Check which element was clicked
-    // First check floating elements
     const pAbs = new Point2(event.clientX, event.clientY);
     const key = this.elementKeyAtCanvasLocation(
       pAbs,
-      (elem) =>
-        !elem.properties.isHidden && (elem.properties.isClickable || elem.properties.isDraggable)
+      /*filter*/ (elem) =>
+        !elem.properties.isHidden &&
+        (elem.properties.isClickable || elem.properties.isDraggable || elem.properties.isSelectable)
     );
-    const elem = this.visualElements[key];
-    this.startPressObj = key;
-    this.startPressLoc = new Point2(event.clientX, event.clientY);
+
     if (key) {
-      this.startPressLocOnElement = this.absToElem(pAbs, elem);
+      const elemContext = this.game.elemContext(key);
+      const elem = this.visualElements[key];
+      const pElem = this.absToElem(pAbs, elem);
+      const validMoves = this.game.validMoves(elem);
+      const validMovesType =
+        validMoves instanceof Array ? "elem" : validMoves instanceof Function ? "point" : null;
+      this.mouseDownContext = {
+        pAbs: pAbs,
+        key: key,
+        ...elemContext,
+        pElem: this.absToElem(pAbs, elemContext.elem),
+        origElemPoint: elemContext.elem.point,
+      };
+    } else {
+      this.mouseDownContext = {
+        pAbs: pAbs,
+        key: null,
+        elem: null,
+        validMovesType: null,
+        validMoves: null,
+        pElem: null,
+        origElemPoint: null,
+      };
     }
-    this.isDragging = false;
-    console.log(`Mouse down on ${key}`);
   }
 
   onMouseMove(event) {
-    if (this.startPressObj) {
-      const elem = this.visualElements[this.startPressObj];
-      if (elem.properties.isDraggable) {
-        const pAbs = new Point2(event.clientX, event.clientY);
-        if (!this.isDragging && pAbs.distanceTo(this.startPressLoc) > 10) {
-          this.game.onElementDragStart(this.startPressObj);
-          this.isDragging = true;
-        }
-        const pElem = this.absToElemParent(pAbs, elem);
-        elem.point = pElem.minus(this.startPressLocOnElement);
-        this.draw();
-      }
+    if (event instanceof Touch || event.buttons > 0) {
+      this.onMouseDrag(event);
+    } else {
+      this.onMouseHover(event);
     }
   }
 
   onMouseUp(event) {
     // First check if we should register drag or click
     const pAbs = new Point2(event.clientX, event.clientY);
-    if (this.isDragging && pAbs.distanceTo(this.startPressLoc) > 10) {
-      // Finished drag
-      this.game.onElementDragEnd(this.startPressObj);
-      this.isDragging = false;
-    } else if (this.startPressObj) {
-      const elem = this.visualElements[this.startPressObj];
-      if (elem.properties.isDraggable && pAbs.distanceTo(this.startPressLoc) > 0) {
-        // Cancelled drag
-        elem.point = this.absToElemParent(this.startPressLoc, elem).minus(
-          this.startPressLocOnElement
-        );
-        this.game.onElementDragStartUndo(this.startPressObj);
-      } else if (elem.properties.isClickable && elem.inBounds(this.absToElemParent(pAbs, elem))) {
-        // Clicked
-        this.game.onElementClick(this.startPressObj);
+
+    if (pAbs.distanceTo(this.mouseDownContext.pAbs) > 0) {
+      // DRAG
+      if (!this.mouseDownContext.key) {
+        // Dragged from empty space, do nothing
+      } else if (this.mouseDownContext.validMovesType === "elem") {
+        if (!tryMoveElemToElem(this.mouseDownContext.key, this.elementKeyAtCanvasLocation(pAbs))) {
+          this.mouseDownContext.elem.point = this.mouseDownContext.origElemPoint;
+        }
+      } else if (this.mouseDownContext.validMovesType === "point") {
+        if (!tryMoveElemToPoint(this.mouseDownContext.key, this.absToBoard(pAbs))) {
+          this.mouseDownContext.elem.point = this.mouseDownContext.origElemPoint;
+        }
+      } else {
+        // Invalid move type
+        console.error("Invalid move type: ", this.mouseDownContext.validMovesType);
+        this.mouseDownContext.elem.point = this.mouseDownContext.origElemPoint;
+      }
+    } else {
+      // CLICK
+      if (this.mouseDownContext.validMovesType === "elem") {
+        this.game.onElementClick(this.mouseDownContext.key);
+      } else if (this.mouseDownContext.validMovesType === "point") {
+        this.game.onPointClick(pAbs);
+      } else {
+        // Pass
       }
     }
 
-    this.startPressObj = null;
-    this.startPressLoc = null;
-    this.startPressLocOnElement = null;
+    this.mouseDownContext = null;
     this.draw();
+  }
+
+  onMouseDrag(event) {
+    // console.log(this.mouseDownContext);
+    if (this.mouseDownContext.key) {
+      // Dragging an element
+      if (this.mouseDownContext.elem.properties.isDraggable) {
+        const pAbs = new Point2(event.clientX, event.clientY);
+        const pElemParent = this.absToElemParent(pAbs, this.mouseDownContext.elem);
+        this.mouseDownContext.elem.point = pElemParent.minus(this.mouseDownContext.pElem);
+        this.draw();
+      }
+    } else {
+      // Dragging blank space -> default to pan
+      const absPnew = new Point2(event.clientX, event.clientY);
+      this.canvasNav.manualPan(
+        absPnew.minus(this.mouseDownContext.pAbs).scale(1 / this.canvasNav.zoomLevel)
+      );
+      this.mouseDownContext.pAbs = absPnew;
+    }
+  }
+
+  onMouseHover(event) {
+    // TODO
+    this.ctx.fillText("Hover", 210, 210);
   }
 
   absToElem(point, element) {

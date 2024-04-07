@@ -28,6 +28,12 @@ export default class CanvasNavigation {
     });
   }
 
+  manualPan(point) {
+    this.panX += point.x;
+    this.panY += point.y;
+    this.updateCanvas();
+  }
+
   /// Handle computer mouse wheel events
   handleWheel(event) {
     event.preventDefault();
@@ -38,9 +44,8 @@ export default class CanvasNavigation {
       this.zoomLevel = Math.min(Math.max(0.125, this.zoomLevel), 4);
     } else {
       // Pan the canvas
-      const panSpeed = 5;
-      this.panX -= event.deltaX * panSpeed;
-      this.panY -= event.deltaY * panSpeed;
+      this.panX -= event.deltaX / this.zoomLevel;
+      this.panY -= event.deltaY / this.zoomLevel;
     }
 
     this.updateCanvas();
