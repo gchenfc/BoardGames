@@ -24,11 +24,12 @@ const DEFAULT_STATE = {
 };
 
 export class VisualElement {
-  constructor(x, y, width, height, sprite = null, properties = {}, state = {}) {
+  constructor(x, y, width, height, sprite = null, properties = {}, state = {}, angle = 0) {
     this.point = new Point2(x, y);
     this.width = width;
     this.height = height;
     this.sprite = sprite;
+    this.angle = angle;
     this.properties = { ...DEFAULT_PROPERTIES, ...properties };
     this.state = { ...DEFAULT_STATE, ...state };
   }
@@ -36,7 +37,15 @@ export class VisualElement {
   /// Function to draw this element.  Can override this function to draw custom elements
   drawSprite(ctx) {
     if (this.sprite) {
-      ctx.drawImage(this.sprite, this.point.x, this.point.y, this.width, this.height);
+      if (this.angle == 0) {
+        ctx.drawImage(this.sprite, this.point.x, this.point.y, this.width, this.height);
+      } else {
+        ctx.translate(this.point.x + this.width / 2, this.point.y + this.height / 2);
+        ctx.rotate(this.angle);
+        ctx.drawImage(this.sprite, -this.width / 2, -this.height / 2, this.width, this.height);
+        ctx.rotate(-this.angle);
+        ctx.translate(-(this.point.x + this.width / 2), -(this.point.y + this.height / 2));
+      }
     }
   }
 

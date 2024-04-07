@@ -34,6 +34,10 @@ export default class Game {
     this._WARNING("tryMoveElemToPoint");
   }
 
+  buttonClicked(buttonKey) {
+    this._WARNING("buttonClicked");
+  }
+
   /******************************  Optional Functions to Implement  ******************************/
   /// The user click-ed an element
   onElementClick(clickedElemContext) {
@@ -63,7 +67,7 @@ export default class Game {
     if (!this.selectedElemContext) {
       // We didn't currently have anything selected
       if (clickedElemContext.elem.properties.isClickable) {
-        // TODO: what behavior should this have?
+        this.buttonClicked(clickedElemContext.key);
       } else if (clickedElemContext.elem.properties.isSelectable) {
         // This is now the selected element
         this.selectedElemContext = clickedElemContext;
@@ -100,6 +104,10 @@ export default class Game {
   /// Send a move to the server
   sendMove(move) {
     // TODO: implement
+  }
+
+  addEventListener(...args) {
+    this.canvas.canvas.addEventListener(...args);
   }
 
   absToBoard(point) {
@@ -161,24 +169,29 @@ class Canvas {
     this.visualElements = game.visualElements; // alias
     this.debug = debug;
 
-    this.canvas.addEventListener("mousedown", this.onMouseDown.bind(this));
-    this.canvas.addEventListener("mousemove", this.onMouseMove.bind(this));
-    this.canvas.addEventListener("mouseup", this.onMouseUp.bind(this));
-    this.canvas.addEventListener("touchstart", (e) => {
-      if (e.touches.length === 1) {
-        return this.onMouseDown(e.touches[0]);
-      }
-    });
-    this.canvas.addEventListener("touchmove", (e) => {
-      if (e.touches.length === 1) {
-        return this.onMouseMove(e.touches[0]);
-      }
-    });
-    this.canvas.addEventListener("touchend", (e) => {
-      if (e.touches.length === 0) {
-        return this.onMouseUp(e.changedTouches[0]);
-      }
-    });
+    if (!("ontouchstart" in window)) {
+      this.canvas.addEventListener("mousedown", this.onMouseDown.bind(this));
+      this.canvas.addEventListener("mousemove", this.onMouseMove.bind(this));
+      this.canvas.addEventListener("mouseup", this.onMouseUp.bind(this));
+      this.THRESHOLD = 0;
+    } else {
+      this.canvas.addEventListener("touchstart", (e) => {
+        if (e.touches.length === 1) {
+          return this.onMouseDown(e.touches[0]);
+        }
+      });
+      this.canvas.addEventListener("touchmove", (e) => {
+        if (e.touches.length === 1) {
+          return this.onMouseMove(e.touches[0]);
+        }
+      });
+      this.canvas.addEventListener("touchend", (e) => {
+        if (e.touches.length === 0) {
+          return this.onMouseUp(e.changedTouches[0]);
+        }
+      });
+      this.THRESHOLD = 5;
+    }
   }
 
   draw() {
@@ -239,7 +252,7 @@ class Canvas {
     // First check if we should register drag or click
     const pAbs = new Point2(event.clientX, event.clientY);
 
-    if (pAbs.distanceTo(this.mouseDownContext.pAbs) > 0) {
+    if (pAbs.distanceTo(this.mouseDownContext.pAbs) > this.THRESHOLD) {
       // DRAG
       if (!this.mouseDownContext.key) {
         // Dragged from empty space, do nothing
