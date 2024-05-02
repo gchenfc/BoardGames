@@ -1,6 +1,12 @@
+/**
+ * Here we implement the game logic for Carcassonne.
+ * TODO: implement scoring & meeple placement.
+ */
+
 import { Card, DECK } from "./cards.js";
 import Point2 from "../util/point2.js";
 import shuffleArray from "../util/shuffle.js";
+import GameStateInterface from "../util/game-logic.js";
 
 export class CardState {
   constructor(card, angle, hidden) {
@@ -24,7 +30,10 @@ export class CardState {
   }
 }
 
-export class GameState {
+/***************************************************************************************************
+ * Carcasonne GameState
+ **************************************************************************************************/
+export class GameState extends GameStateInterface {
   /**
    *
    * @param {Point2: CardState} placed Dictionary of card locations
@@ -34,6 +43,7 @@ export class GameState {
    * @param {Int} currentPlayer Index of the current player
    */
   constructor(placed, drawPile, meeples, scores, currentPlayer) {
+    super();
     this.placed = placed;
     this.drawPile = drawPile;
     this.meeples = meeples;
@@ -69,7 +79,7 @@ export class GameState {
     return false;
   }
 
-  /****************************************************** */
+  /*********************************** end mandatory interface ************************************/
 
   peek() {
     return this.drawPile[this.drawPile.length - 1];
@@ -85,7 +95,13 @@ export class GameState {
 
     function checkEdgeLoc(gameState, loc, myEdge, targetEdge) {
       if (!(loc in gameState.placed)) return true;
-      console.log(`checking location ${loc.x} ${loc.y} edge ${targetEdge} ${myEdge}.  ${gameState.placed[loc].edge(targetEdge)}, ${thisCardState.edge(myEdge)}.  Angles are ${gameState.placed[loc].angle}, ${thisCardState.angle}.`)
+      console.log(
+        `checking location ${loc.x} ${loc.y} edge ${targetEdge} ${myEdge}.  ${gameState.placed[
+          loc
+        ].edge(targetEdge)}, ${thisCardState.edge(myEdge)}.  Angles are ${
+          gameState.placed[loc].angle
+        }, ${thisCardState.angle}.`
+      );
       const ret = gameState.placed[loc].edge(targetEdge) == thisCardState.edge(myEdge);
       return ret;
     }

@@ -1,6 +1,17 @@
-import { cc } from "./utils.js";
+/**
+ * This contains all the cards in the game.
+ * https://en.wikipedia.org/wiki/Carcassonne_(board_game)#
+ * 
+ * There are 4 pieces of information we need for each card:
+ * 1. The edges of the card, e.g. "RFCF" (road, field, city, field)
+ * 2. Any special symbols on the interior of the card, e.g. "S" (shield), "M" (monastery)
+ * 3. Interior connections between edges (e.g. if CFCF could have connected city regions or 2 separate cities)
+ * 4. Interior connections between fields (each edge has 2 halves, so we define the connectivity of the 8 half-edges)
+ * 
+ * We also define the full deck of cards, including qty of each card.
+ */
 
-// https://en.wikipedia.org/wiki/Carcassonne_(board_game)#
+import { cc } from "./utils.js";
 
 const EDGES = { F: "field", R: "road", W: "river", C: "city" };
 const QUALITIES = { M: "monastery", S: "shield" };

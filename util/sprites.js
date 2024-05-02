@@ -1,3 +1,7 @@
+/**
+ * Load sprites for use in an HTML canvas.
+ */
+
 const sprites = {};
 
 export default function createSprite(url, cb = null) {

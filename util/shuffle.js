@@ -1,4 +1,10 @@
-// https://stackoverflow.com/a/12646864/9151520
+/**
+ * Shuffles array (by copy).
+ * Usage:
+ *   const shuffled = shuffleArray([1, 2, 3, 4, 5]);
+ * 
+ * See https://stackoverflow.com/a/12646864/9151520
+ */
 
 export default function shuffleArray(array_) {
   const array = [...array_];

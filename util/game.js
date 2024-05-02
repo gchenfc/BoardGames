@@ -6,7 +6,7 @@ import { Client } from "./client.js";
 /// Game class is a common interface for games
 //  Update the game by updating this.visualElements and calling this.updateDraw()
 export default class Game {
-  GameState = undefined;
+  GameState = undefined; //<-- Override this with your GameState class (game-logic.js)!!!
 
   constructor(visualElements = {}, debug = false) {
     this.visualElements = visualElements;

@@ -1,3 +1,11 @@
+/**
+ * This file contains the VisualElement class and its subclasses.  These classes are used to
+ * represent elements in the game that are drawn on the screen.
+ *
+ * BoardElement objects pan around with the screen while FloatingElement objects stay in the same
+ * place.  They both inherit from VisualElement (only isFloating is different between the two).
+ */
+
 import Point2 from "./point2.js";
 
 export const SelectBehaviors = Object.freeze({

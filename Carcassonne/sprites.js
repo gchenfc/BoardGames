@@ -1,3 +1,7 @@
+/**
+ * Load the sprites for the Carcassonne game.
+ */
+
 import createSprite from "../util/sprites.js";
 import { Card } from "./cards.js";
 

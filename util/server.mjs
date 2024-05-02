@@ -1,3 +1,23 @@
+/**
+ * The server module handles multiple connections and keeps the master game state for each "room".
+ * 
+ * Usage:
+ *    import {Server, DEFAULT_PORT} from "../util/server.mjs";
+ *    import { GameState } from "./...js";
+ *
+ *    const server = new Server(GameState);
+ *    server.start(DEFAULT_PORT);
+ * 
+ * Terminal command:
+ *    node my_folder/my_server.mjs
+ * 
+ * where GameState is your class that implements the GameStateInterface in game-logic.js.
+ * 
+ * Each time a move is made, the client should send it to the server and the server responds with
+ * the new game state.  Ideally, the client should re-draw the game state based on the new state
+ * and we should never rely on determinism to ensure synchronization.
+ */
+
 // const express = require("express");
 // const http = require("http");
 // const socketIO = require("socket.io");

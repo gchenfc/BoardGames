@@ -1,4 +1,9 @@
-// const GenericServer = require("../util/server.mjs");
+/**
+ * Run this server using
+ * ```sh
+ * node Carcassonne/server.mjs
+ * ```
+ */
 import {Server, DEFAULT_PORT} from "../util/server.mjs";
 import { GameState } from "./game-logic.js";
 
