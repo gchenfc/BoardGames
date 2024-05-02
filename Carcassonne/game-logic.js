@@ -3,9 +3,8 @@
  * TODO: implement scoring & meeple placement.
  */
 
-import { Card, DECK } from "./cards.js";
+import { Card, ShuffledDeck } from "./cards.js";
 import Point2 from "../util/point2.js";
-import shuffleArray from "../util/shuffle.js";
 import GameStateInterface from "../util/game-logic.js";
 
 export class CardState {
@@ -31,6 +30,13 @@ export class CardState {
 }
 
 /***************************************************************************************************
+ * Configurations
+ **************************************************************************************************/
+export const CONFIG = {
+  WITH_RIVERS: false,
+};
+
+/***************************************************************************************************
  * Carcasonne GameState
  **************************************************************************************************/
 export class GameState extends GameStateInterface {
@@ -52,7 +58,7 @@ export class GameState extends GameStateInterface {
   }
 
   static New(numPlayers) {
-    return new GameState({}, shuffleArray(DECK), {}, Array(numPlayers).fill(0));
+    return new GameState({}, ShuffledDeck(CONFIG.WITH_RIVERS), {}, Array(numPlayers).fill(0));
   }
 
   static Clone(obj) {

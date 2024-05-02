@@ -1,16 +1,17 @@
 /**
  * This contains all the cards in the game.
  * https://en.wikipedia.org/wiki/Carcassonne_(board_game)#
- * 
+ *
  * There are 4 pieces of information we need for each card:
  * 1. The edges of the card, e.g. "RFCF" (road, field, city, field)
  * 2. Any special symbols on the interior of the card, e.g. "S" (shield), "M" (monastery)
  * 3. Interior connections between edges (e.g. if CFCF could have connected city regions or 2 separate cities)
  * 4. Interior connections between fields (each edge has 2 halves, so we define the connectivity of the 8 half-edges)
- * 
+ *
  * We also define the full deck of cards, including qty of each card.
  */
 
+import shuffleArray from "../util/shuffle.js";
 import { cc } from "./utils.js";
 
 const EDGES = { F: "field", R: "road", W: "river", C: "city" };
@@ -78,9 +79,9 @@ export const KEYS_2_CARDS = CARDS.reduce((acc, value) => {
   return acc;
 }, {});
 
-export const DECK = [].concat(
+const DECK = [].concat(
   Array(4).fill(CARDS[0]),
-  Array(2).fill(CARDS[1]),
+  Array(2 - 2).fill(CARDS[1]), // starting and ending river tiles
   Array(2).fill(CARDS[2]),
   Array(2).fill(CARDS[3]),
   Array(5).fill(CARDS[4]),
@@ -104,7 +105,7 @@ export const DECK = [].concat(
   Array(9).fill(CARDS[22]),
   Array(1).fill(CARDS[23]),
   Array(1).fill(CARDS[24]),
-  Array(4).fill(CARDS[25]),
+  Array(4 - 1).fill(CARDS[25]), // starting non-river tile
   Array(3).fill(CARDS[26]),
   Array(3).fill(CARDS[27]),
   Array(2).fill(CARDS[28]),
@@ -113,3 +114,15 @@ export const DECK = [].concat(
   Array(3).fill(CARDS[31]),
   Array(1).fill(CARDS[32])
 );
+
+const DECK_RIVER = [...DECK.filter((card) => card.edges.indexOf("W") !== -1)];
+const DECK_NONRIVER = [...DECK.filter((card) => card.edges.indexOf("W") === -1)];
+
+export function ShuffledDeck(withRivers = true) {
+  if (withRivers) {
+    const ret = [CARDS[1], ...shuffleArray(DECK_RIVER), CARDS[1], ...shuffleArray(DECK_NONRIVER)];
+    return ret.reverse();
+  } else {
+    return [CARDS[25], ...shuffleArray(DECK_NONRIVER)].reverse();
+  }
+}

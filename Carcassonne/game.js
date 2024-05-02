@@ -3,11 +3,15 @@
  */
 
 import Game from "../util/game.js";
-import { CardState, GameState } from "./game-logic.js";
+import { CardState, GameState, CONFIG } from "./game-logic.js";
 import Point2 from "../util/point2.js";
 import { BoardElement, FloatingElement } from "../util/element.js";
 import createSprite from "../util/sprites.js";
 import { SPRITES } from "./sprites.js";
+
+/***************************************************************************************************
+ * Configurations
+ **************************************************************************************************/
 
 const GRID_DIM = 100,
   GRID_PADDING = 10;
@@ -15,8 +19,11 @@ const GRID_W = 40,
   GRID_H = 40;
 
 const HIGHLIGHT_VALID_MOVES = true;
+CONFIG.WITH_RIVERS = false; // TODO: move this to the server logic
 
-/**********************************/
+/***************************************************************************************************
+ * Grid Space
+ **************************************************************************************************/
 
 class GridSpace extends BoardElement {
   constructor(i, j) {
@@ -46,7 +53,9 @@ class GridSpace extends BoardElement {
   }
 }
 
-/**********************************/
+/***************************************************************************************************
+ * Main Carcassonne Game
+ **************************************************************************************************/
 
 export default class Carcassonne extends Game {
   GameState = GameState;
@@ -68,7 +77,7 @@ export default class Carcassonne extends Game {
       10,
       GRID_DIM - GRID_PADDING,
       GRID_DIM - GRID_PADDING,
-      null,
+      createSprite("sprites/pieces_scans/back.jpg"),
       {
         isDraggable: false,
       }
@@ -195,5 +204,4 @@ export default class Carcassonne extends Game {
       }
     }
   }
-
 }
