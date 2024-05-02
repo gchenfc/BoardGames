@@ -52,7 +52,7 @@ export default class Carcassonne extends Game {
   GameState = GameState;
 
   // Constructor mainly sets up the UI elements
-  constructor(gameState) {
+  constructor() {
     let visualElements = {};
 
     // Create grid
@@ -98,8 +98,6 @@ export default class Carcassonne extends Game {
 
     super(visualElements);
 
-    this.updateGameState(gameState);
-
     // Add a keyboard listener for the "r" key to rotate the top draw card
     window.addEventListener("keydown", (e) => {
       if (e.key === "r") {
@@ -143,7 +141,7 @@ export default class Carcassonne extends Game {
   validMoves(elemKey) {
     if (elemKey === "topDrawCard") {
       const cardState = new CardState(
-        gameState.peek(),
+        this.gameState.peek(),
         this.visualElements["topDrawCard"].angle / (Math.PI / 2),
         false
       );

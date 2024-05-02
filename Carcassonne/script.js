@@ -3,9 +3,8 @@
  */
 
 import Carcassonne from "./game.js";
-import { GameState } from "./game-logic.js";
 
-const myGame = new Carcassonne(GameState.New(2));
+const myGame = new Carcassonne();
 
 document.addEventListener("DOMContentLoaded", function () {
   myGame.updateDraw();

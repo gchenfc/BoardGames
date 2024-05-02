@@ -1,7 +1,8 @@
 import CanvasNavigation from "./canvas-navigation.js";
 import { VisualElement, SelectBehaviors } from "./element.js";
 import Point2 from "./point2.js";
-import { Client } from "./client.js";
+// import { Client } from "./client.js";
+import { DummyClient as Client } from "./client-dummy.js";
 
 /// Game class is a common interface for games
 //  Update the game by updating this.visualElements and calling this.updateDraw()
