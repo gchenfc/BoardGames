@@ -1,0 +1,50 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+canvas {
+  display: block;
+  background-color: #f0f0f0;
+}
+
+/* Floating Licensing & attribution info */
+.credits {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  max-width: 75px;
+  max-height: 0px;
+  margin: 0;
+  background: rgba(0, 0, 0, 0.1);
+  color: white;
+  padding: 20px 5px 0px 5px;
+  font-size: 10px;
+  text-align: right;
+  z-index: 1000;
+  transition: 0.5s all;
+  text-wrap: nowrap;
+}
+
+/* Standard CC BY-SA 4.0 license */
+.credits::before {
+  content: "CC BY-SA 4.0";
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 73px;
+  height: 10px;
+  background-image: url("../assets/cc.svg");
+  background-repeat: no-repeat;
+}
+
+/* Rise on hover */
+.credits:hover {
+  background: rgba(0, 0, 0, 0.5);
+  max-width: 350px;
+  max-height: 100px;
+}
