@@ -21,6 +21,7 @@ const DEFAULT_STATE = {
   isDragging: false,
   isSelected: false,
   isHovered: false,
+  isHighlighted: false,
 };
 
 export class VisualElement {
@@ -41,9 +42,9 @@ export class VisualElement {
         ctx.drawImage(this.sprite, this.point.x, this.point.y, this.width, this.height);
       } else {
         ctx.translate(this.point.x + this.width / 2, this.point.y + this.height / 2);
-        ctx.rotate(this.angle);
-        ctx.drawImage(this.sprite, -this.width / 2, -this.height / 2, this.width, this.height);
         ctx.rotate(-this.angle);
+        ctx.drawImage(this.sprite, -this.width / 2, -this.height / 2, this.width, this.height);
+        ctx.rotate(this.angle);
         ctx.translate(-(this.point.x + this.width / 2), -(this.point.y + this.height / 2));
       }
     }
@@ -62,7 +63,7 @@ export class VisualElement {
       ctx.fillText(this.toString(), this.point.x, this.point.y + 10, this.width);
     }
 
-    if (this.state.isSelected || this.state.isDragging) {
+    if (this.state.isSelected || this.state.isDragging || this.state.isHighlighted) {
       ctx.strokeStyle = "rgba(0, 255, 0, 1)";
       ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
       ctx.strokeRect(this.point.x, this.point.y, this.width, this.height);
