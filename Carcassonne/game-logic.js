@@ -58,7 +58,9 @@ export class GameState extends GameStateInterface {
   }
 
   static New(numPlayers) {
-    return new GameState({}, ShuffledDeck(CONFIG.WITH_RIVERS), {}, Array(numPlayers).fill(0));
+    let state = new GameState({}, ShuffledDeck(CONFIG.WITH_RIVERS), {}, Array(numPlayers).fill(0));
+    state.doMove({ location: new Point2(0, 0), angle: 0 }); // place starting tile
+    return state;
   }
 
   static Clone(obj) {
