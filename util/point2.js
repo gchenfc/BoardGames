@@ -32,6 +32,10 @@ export default class Point2 {
 
   static FromString(s) {
     // Format: "Point2(1.234, 5.678)"
-    return new Point2(...s.match(/-?\d+\.\d+/g).map(parseFloat));
+    return new Point2(...s.match(/-?\d+(\.\d+)?/g).map(parseFloat));
+  }
+
+  static Clone(p) {
+    return new Point2(p.x, p.y);
   }
 }

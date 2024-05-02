@@ -1,14 +1,18 @@
 import CanvasNavigation from "./canvas-navigation.js";
 import { VisualElement, SelectBehaviors } from "./element.js";
 import Point2 from "./point2.js";
+import { Client } from "./client.js";
 
 /// Game class is a common interface for games
 //  Update the game by updating this.visualElements and calling this.updateDraw()
 export default class Game {
+  GameState = undefined;
+
   constructor(visualElements = {}, debug = false) {
     this.visualElements = visualElements;
     this.canvas = new Canvas(this, debug);
     this.selectedElemContext = null;
+    this.client = new Client(this);
   }
 
   /***********************************  Functions to Implement  ***********************************/
@@ -103,7 +107,7 @@ export default class Game {
 
   /// Send a move to the server
   sendMove(move) {
-    // TODO: implement
+    return this.client.sendMove(move);
   }
 
   addEventListener(...args) {
